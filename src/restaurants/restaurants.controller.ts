@@ -34,7 +34,7 @@ export class RestaurantsController {
     }),
   }))
   async create(
-    @Body() createRestaurantDto: Omit<restaurants, "foods" |"id">,
+    @Body() createRestaurantDto: Omit<restaurants, "foods" | "id">,
     @UploadedFile() img: Express.Multer.File
   ) {
     try {
@@ -75,10 +75,11 @@ export class RestaurantsController {
   getRestaurantsOfCategories(
     @Query("categorie") categorie: string,
     @Query("page") page: string = "1",
-    @Query("size") size: string = "10"
+    @Query("size") size: string = "10",
+    @Query("query") query: string
   ) {
     try {
-      return this.restaurantsService.getRestaurantsOfCategories(categorie, +page, +size)
+      return this.restaurantsService.getRestaurantsOfCategories(categorie, +page, +size, query)
     } catch (error) {
       throw new HttpException("Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
     }

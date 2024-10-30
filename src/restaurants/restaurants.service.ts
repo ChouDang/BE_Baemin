@@ -38,17 +38,41 @@ export class RestaurantsService {
   }
 
 
-  async getRestaurantsOfCategories(categorie: string, page: number, size: number) {
+  async getRestaurantsOfCategories(categorie: string, page: number, size: number, query: string) {
 
+    // const restaurants = await this.prisma.restaurants.findMany({
+    //   skip: (page - 1) * size,
+    //   take: size,
+    //   where: {
+    //     foods: {
+    //       some: {
+    //         category_id: categorie
+    //       }
+    //     }
+    //   },
+    //   include: {
+    //     foods: true
+    //   }
+    // });
     const restaurants = await this.prisma.restaurants.findMany({
       skip: (page - 1) * size,
       take: size,
       where: {
-        foods: {
-          some: {
-            category_id: categorie
+        AND: [
+          {
+            foods: {
+              some: {
+                category_id: categorie
+              }
+            }
+          },
+          {
+            OR: [
+              { name: { contains: query, mode: "insensitive" } },
+              { foods: { some: { name: { contains: query, mode: "insensitive" } } } } 
+            ]
           }
-        }
+        ]
       },
       include: {
         foods: true
@@ -59,11 +83,21 @@ export class RestaurantsService {
 
     const totalCount = await this.prisma.restaurants.count({
       where: {
-        foods: {
-          some: {
-            category_id: categorie
+        AND: [
+          {
+            foods: {
+              some: {
+                category_id: categorie
+              }
+            }
+          },
+          {
+            OR: [
+              { name: { contains: query, mode: "insensitive" } },
+              { foods: { some: { name: { contains: query, mode: "insensitive" } } } }
+            ]
           }
-        }
+        ]
       },
     });
 
